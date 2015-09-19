@@ -20,13 +20,14 @@ class circularBuffer{
 		   {
 			 head,tail=-1;
 		   }
-		   void addElmt(int );
-		   int delElmt();
+		   void addElmt(Byte );
+		   Byte delElmt();
 		   void display();
 		   bool isOverFlow();
+		   bool isEmpty();
     };
 
-void circularBuffer::addElmt(int elmt){
+void circularBuffer::addElmt(Byte elmt){
     if((head==0 && tail==MAX-1) || (head+1==tail))
 			  cout<<" Circular Queue is Full";
 		 else
@@ -42,8 +43,8 @@ void circularBuffer::addElmt(int elmt){
 }
 
 
-int circularBuffer::delElmt(){
-    int k;
+Byte circularBuffer::delElmt(){
+    Byte k;
 		 if(head==-1)
 			cout<<"Circular Queue is Empty";
 		 else
@@ -103,6 +104,16 @@ bool circularBuffer::isOverFlow(){
         else if (head-tail >= maximumLowerLimit){
                 return false;
             }
+        }
+}
+
+bool circularBuffer::isEmpty(){
+    if ((head==-1)&&(tail==-1))
+        {
+            return true;
+        }
+        else {
+            return false;
         }
 }
 

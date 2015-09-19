@@ -13,18 +13,38 @@ using namespace std;
 Byte sent_xonxoff = XON;
 bool send_xon = false,
 send_xoff = false;
-
+ int nbyteBuffered = 1;
+ int nbyteConsumed = 1;
 
 
 
 void rcvchar(udp* UDP, circularBuffer buff)
 {
-
+    while ((!eof)&& (sent_xonxoff==XON)){
+        Byte current= UDP->rxchar();
+        buff.addElmt(current);
+        cout<< "Menerima byte ke-" << nbyteBuffered<<endl;
+        nbyteBuffered++;
+        if (buff.isOverFlow()){
+            send_xoff=true;
+            sent_xonxoff=XOFF;
+        }
+    }
 }
 
 void q_get(circularBuffer buff)
 {
+    while (!buff.isEmpty()){
+        Byte current= buff.delElmt();
+        cout<< "Menerima byte ke-" << nbyteConsumed<<":";
+        cout<<"'"<<current<<"'"<<endl;
+        nbyteConsumed++;
 
+        if (!buff.isOverFlow()){
+            send_xon= true;
+            sent_xonxoff = XON;
+        }
+    }
 }
 
 	int main()
