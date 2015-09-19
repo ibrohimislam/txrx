@@ -1,7 +1,7 @@
 /*
 * File : dcomm.h
 */
-#ifndef _DCOMM_H_ 
+#ifndef _DCOMM_H_
 #define _DCOMM_H_
 /* ASCII Const */
 #define SOH 1 /* Start of Header Character */
@@ -26,15 +26,6 @@
 
 typedef unsigned char Byte;
 
-typedef struct QTYPE
-{
-	unsigned int count;
-	unsigned int front;
-	unsigned int rear;
-	unsigned int maxsize;
-	Byte *data;
-} QTYPE;
-
 typedef struct MESGB
 {
 	unsigned int soh;
@@ -46,7 +37,7 @@ typedef struct MESGB
 } MESGB;
 
 typedef struct DATAGRAM {
-	
+
 } DATAGRAM;
 
 #endif

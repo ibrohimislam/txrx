@@ -65,7 +65,7 @@ udp::~udp(){
   delete remoteAddress;
 }
 
-void udp::setTarget(char *targetHost, int targetPort) {  
+void udp::setTarget(char *targetHost, int targetPort) {
   inet_pton(AF_INET,targetHost,&((*remoteAddress).sin_addr.s_addr));
   (*remoteAddress).sin_port=htons(targetPort);
 }
@@ -73,7 +73,7 @@ void udp::setTarget(char *targetHost, int targetPort) {
 char udp::rxchar() {
   struct sockaddr_in packetRemoteAddress;
   socklen_t addrlen = sizeof(packetRemoteAddress);
-  
+
   char *buf = new char();
   int recvlen = recvfrom(*sock, buf, 1, 0, (struct sockaddr *) &packetRemoteAddress, &addrlen);
   return buf[0];

@@ -1,82 +1,61 @@
 /*
-* File : T1_rx.cpp
+* File : rx.cpp
 */
-
+#include "udp.h"
+#include <iostream>
 #include "dcomm.h"
-
+#include "circularBuffer.h"
+#include <thread>         // std::thread
 /* Delay to adjust speed of consuming buffer, in milliseconds */
 #define DELAY 500
-/* Define receive buffer size */
-#define RXQSIZE 8
+using namespace std;
 
-Byte rxbuf[RXQSIZE];
-QTYPE rcvq = { 0, 0, 0, RXQSIZE, rxbuf };
-QTYPE *rxq = &rcvq;
 Byte sent_xonxoff = XON;
 bool send_xon = false,
 send_xoff = false;
+ int nbyteBuffered = 1;
+ int nbyteConsumed = 1;
 
-/* Socket */
-int sockfd; // listen on sock_fd
-/* Functions declaration */
-static Byte *rcvchar(int sockfd, QTYPE *queue);
-static Byte *q_get(QTYPE *, Byte *);
 
-int main(int argc, char *argv[])
+
+void rcvchar(udp* UDP, circularBuffer buff)
 {
-	Byte c;
-	
-	/*
-	Insert code here to bind socket to the port number given in argv[1].
-	*/
-	
-	/* Initialize XON/XOFF flags */
-	
-	/* Create child process */
-	
-	/*** IF PARENT PROCESS ***/
-	while (true) {
-		c = *(rcvchar(sockfd, rxq));
-		
-		/* Quit on end of file */
-		if (c == Endfile) {
-			exit(0);
-		}
+    while ((!eof)&& (sent_xonxoff==XON)){
+        Byte current= UDP->rxchar();
+        buff.addElmt(current);
+        cout<< "Menerima byte ke-" << nbyteBuffered<<endl;
+        nbyteBuffered++;
+        if (buff.isOverFlow()){
+            send_xoff=true;
+            sent_xonxoff=XOFF;
+        }
+    }
+}
+
+void q_get(circularBuffer buff)
+{
+    while (!buff.isEmpty()){
+        Byte current= buff.delElmt();
+        cout<< "Menerima byte ke-" << nbyteConsumed<<":";
+        cout<<"'"<<current<<"'"<<endl;
+        nbyteConsumed++;
+
+        if (!buff.isOverFlow()){
+            send_xon= true;
+            sent_xonxoff = XON;
+        }
+    }
+}
+
+	int main()
+	{
+	  thread first (rcvchar, UDP, buff);     // spawn new thread that calls rcvchar(UDP,buff)
+	  thread second (q_get,buff);  // spawn new thread that calls q_get(buff)
+
+	  // synchronize threads:
+	  first.join();                // pauses until first finishes
+	  second.join();               // pauses until second finishes
+
+	  return 0;
 	}
-	
-	/*** ELSE IF CHILD PROCESS ***/
-	while (true) {
-		/* Call q_get */
-		/* Can introduce some delay here. */
-	}
-}
 
-static Byte *rcvchar(int sockfd, QTYPE *queue)
-{
-	/*
-	Insert code here.
-	Read a character from socket and put it to the receive buffer.
-	If the number of characters in the receive buffer is above certain
-	level, then send XOFF and set a flag (why?).
-	Return a pointer to the buffer where data is put.
-	*/
-}
-
-/* q_get returns a pointer to the buffer where data is read or NULL if
-* buffer is empty.
-*/
-
-static Byte *q_get(QTYPE *queue, Byte *data)
-{
-	Byte *current;
-	/* Nothing in the queue */
-	if (!queue->count) return (NULL);
-
-	/*
-	Insert code here.
-	Retrieve data from buffer, save it to "current" and "data"
-	If the number of characters in the receive buffer is below certain
-	level, then send XON.
-	Increment front index and check for wraparound.
-	*/
-}

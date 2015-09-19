@@ -4,13 +4,15 @@
 
 
 #include<iostream>
+#include "dcomm.h"
 using namespace std;
 
  const int MAX = 100;
- const int LIMIT = 10;
+ const int minimumUpperLimit = 10; /*10 adalah space minimum yang akan mengaktifkan XOFF*/
+ const int maximumLowerLimit = 20;  /*20 adalah space minimum untuk mengaktifkan XON*/
 
 class circularBuffer{
-    int a[MAX];
+    Byte a[MAX];
     int head,tail;
 
     public:
@@ -18,13 +20,14 @@ class circularBuffer{
 		   {
 			 head,tail=-1;
 		   }
-		   void addElmt(int );
-		   int delElmt();
+		   void addElmt(Byte );
+		   Byte delElmt();
 		   void display();
-		   bool isNearFull();
+		   bool isOverFlow();
+		   bool isEmpty();
     };
 
-void circularBuffer::addElmt(int elmt){
+void circularBuffer::addElmt(Byte elmt){
     if((head==0 && tail==MAX-1) || (head+1==tail))
 			  cout<<" Circular Queue is Full";
 		 else
@@ -40,8 +43,8 @@ void circularBuffer::addElmt(int elmt){
 }
 
 
-int circularBuffer::delElmt(){
-    int k;
+Byte circularBuffer::delElmt(){
+    Byte k;
 		 if(head==-1)
 			cout<<"Circular Queue is Empty";
 		 else
@@ -85,22 +88,33 @@ void circularBuffer::display(){
 }
 
 
-bool circularBuffer::isNearFull(){
+bool circularBuffer::isOverFlow(){
     if (head>tail){
-        if ((MAX-head+tail) <=LIMIT){
+        if ((MAX-head+tail) <=minimumUpperLimit){
+            return true;
+        }
+        else if ((MAX-head+tail) >=maximumLowerLimit){
+            return false;
+        }
+    }
+    else{
+        if (head-tail <= minimumUpperLimit){
+            return true;
+        }
+        else if (head-tail >= maximumLowerLimit){
+                return false;
+            }
+        }
+}
+
+bool circularBuffer::isEmpty(){
+    if ((head==-1)&&(tail==-1))
+        {
             return true;
         }
         else {
             return false;
         }
-    }
-    else{
-        if (head-tail <= LIMIT){
-            return true;
-        }
-            else{
-                return false;
-            }
-        }
 }
+
 
