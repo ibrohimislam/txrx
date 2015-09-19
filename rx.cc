@@ -80,8 +80,3 @@ static Byte *q_get(QTYPE *queue, Byte *data)
 	Increment front index and check for wraparound.
 	*/
 }
-
-/*
-* File : dcomm.h
-*/
-#ifndef _DCOMM_H_ 
