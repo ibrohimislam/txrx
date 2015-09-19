@@ -45,4 +45,8 @@ typedef struct MESGB
 	Byte *data;
 } MESGB;
 
+typedef struct DATAGRAM {
+	
+} DATAGRAM;
+
 #endif
