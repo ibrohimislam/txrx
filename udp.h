@@ -28,6 +28,7 @@ public:
   void setTarget(char *targetHost, int targetPort);
   char rxchar();
   void txchar(char c);
+  int getLocalPort();
 private:
   struct sockaddr_in *localAddress;
   struct sockaddr_in *remoteAddress;
@@ -79,10 +80,21 @@ char udp::rxchar() {
 }
 
 void udp::txchar(char c) {
-  if(sendto(*sock, &c, 1, 0, (struct sockaddr*) remoteAddress, sizeof(*remoteAddress))!=1) {
-    perror("Mismatch in number of bytes sent");
-    exit(EXIT_FAILURE);
+  sendto(*sock, &c, 1, 0, (struct sockaddr*) remoteAddress, sizeof(*remoteAddress));
+}
+
+int udp::getLocalPort(){
+  struct sockaddr_in cLocalAddress;
+  socklen_t addrlen = sizeof(cLocalAddress);
+
+  if(getsockname(*sock, (struct sockaddr *)&cLocalAddress, &addrlen) == 0 &&
+     cLocalAddress.sin_family == AF_INET &&
+     addrlen == sizeof(cLocalAddress)) {
+    
+    return ntohs(cLocalAddress.sin_port);
   }
+
+  return 0;
 }
 
 #endif
