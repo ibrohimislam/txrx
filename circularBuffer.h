@@ -4,6 +4,7 @@
 
 
 #include<iostream>
+#include "dcomm.h"
 using namespace std;
 
  const int MAX = 100;
@@ -11,7 +12,7 @@ using namespace std;
  const int maximumLowerLimit = 20;  /*20 adalah space minimum untuk mengaktifkan XON*/
 
 class circularBuffer{
-    int a[MAX];
+    Byte a[MAX];
     int head,tail;
 
     public:
