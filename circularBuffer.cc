@@ -7,7 +7,8 @@
 using namespace std;
 
  const int MAX = 100;
- const int LIMIT = 10;
+ const int minimumUpperLimit = 10; /*10 adalah space minimum yang akan mengaktifkan XOFF*/
+ const int maximumLowerLimit = 20;  /*20 adalah space minimum untuk mengaktifkan XON*/
 
 class circularBuffer{
     int a[MAX];
@@ -21,7 +22,7 @@ class circularBuffer{
 		   void addElmt(int );
 		   int delElmt();
 		   void display();
-		   bool isNearFull();
+		   bool isOverFlow();
     };
 
 void circularBuffer::addElmt(int elmt){
@@ -85,22 +86,23 @@ void circularBuffer::display(){
 }
 
 
-bool circularBuffer::isNearFull(){
+bool circularBuffer::isOverFlow(){
     if (head>tail){
-        if ((MAX-head+tail) <=LIMIT){
+        if ((MAX-head+tail) <=minimumUpperLimit){
             return true;
         }
-        else {
+        else if ((MAX-head+tail) >=maximumLowerLimit){
             return false;
         }
     }
     else{
-        if (head-tail <= LIMIT){
+        if (head-tail <= minimumUpperLimit){
             return true;
         }
-            else{
+        else if (head-tail >= maximumLowerLimit){
                 return false;
             }
         }
 }
+
 
