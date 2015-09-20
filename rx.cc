@@ -14,7 +14,7 @@ Byte sent_xonxoff = XON;
 bool send_xon = false,
 send_xoff = false;
 
-int nbyteBuffered = 1;  
+int nbyteBuffered = 1;
 int nbyteConsumed = 1;
 
 void rcvchar(udp* UDP, circularBuffer *buff)
@@ -22,15 +22,15 @@ void rcvchar(udp* UDP, circularBuffer *buff)
     Byte current;
 
     while ((current !=ETX) && (sent_xonxoff==XON)){
-        
+
         if (current!=0)
         {
             current = UDP->rxchar();
             buff->addElmt(current);
-            
+
             cout<< "Menerima byte ke-"<< nbyteBuffered<<endl;
             nbyteBuffered++;
-            
+
             if (buff->isOverFlow()){
                 send_xoff=true;
                 sent_xonxoff=XOFF;
@@ -41,14 +41,15 @@ void rcvchar(udp* UDP, circularBuffer *buff)
 
 void q_get(circularBuffer *buff)
 {
-    while (!buff->isEmpty()){
+    Byte current;
+    while ((current !=ETX)){
         usleep(100000u);
 
         Byte current= buff->delElmt();
-        nbyteConsumed++;
-        
+
         cout<< "Mengonsumsi byte ke-" << nbyteConsumed<<":"<< "'"<<current<<"'"<<endl;
-        
+        nbyteConsumed++;
+
         if (!buff->isOverFlow()){
             send_xon= true;
             sent_xonxoff = XON;
