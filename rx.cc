@@ -13,49 +13,61 @@ using namespace std;
 Byte sent_xonxoff = XON;
 bool send_xon = false,
 send_xoff = false;
- int nbyteBuffered = 1;
- int nbyteConsumed = 1;
 
+int nbyteBuffered = 1;  
+int nbyteConsumed = 1;
 
-
-void rcvchar(udp* UDP, circularBuffer buff)
+void rcvchar(udp* UDP, circularBuffer *buff)
 {
-    while ((!eof)&& (sent_xonxoff==XON)){
-        Byte current= UDP->rxchar();
-        buff.addElmt(current);
-        cout<< "Menerima byte ke-" << nbyteBuffered<<endl;
-        nbyteBuffered++;
-        if (buff.isOverFlow()){
-            send_xoff=true;
-            sent_xonxoff=XOFF;
+    Byte current;
+
+    current = UDP->rxchar();
+    while ((current !=ETX) && (sent_xonxoff==XON)){
+        
+        if (current!=0)
+        {
+            buff->addElmt(current);
+            
+            cout<< "Menerima byte ke-"<< nbyteBuffered<<endl;
+            nbyteBuffered++;
+            
+            if (buff->isOverFlow()){
+                send_xoff=true;
+                sent_xonxoff=XOFF;
+            }
         }
+
+        current = UDP->rxchar();
     }
 }
 
-void q_get(circularBuffer buff)
+void q_get(circularBuffer *buff)
 {
-    while (!buff.isEmpty()){
-        Byte current= buff.delElmt();
-        cout<< "Menerima byte ke-" << nbyteConsumed<<":";
-        cout<<"'"<<current<<"'"<<endl;
-        nbyteConsumed++;
+    while (!buff->isEmpty()){
+        usleep(100000u);
 
-        if (!buff.isOverFlow()){
+        Byte current= buff->delElmt();
+        nbyteConsumed++;
+        
+        cout<< "Mengonsumsi byte ke-" << nbyteConsumed<<":"<< "'"<<current<<"'"<<endl;
+        
+        if (!buff->isOverFlow()){
             send_xon= true;
             sent_xonxoff = XON;
         }
     }
 }
 
-	int main()
-	{
-	  thread first (rcvchar, UDP, buff);     // spawn new thread that calls rcvchar(UDP,buff)
-	  thread second (q_get,buff);  // spawn new thread that calls q_get(buff)
+int main()
+{
+    circularBuffer *buff = new circularBuffer();
+    udp *UDP = new udp(60000);
 
-	  // synchronize threads:
-	  first.join();                // pauses until first finishes
-	  second.join();               // pauses until second finishes
+    thread first (rcvchar, UDP, buff); // spawn new thread that calls rcvchar(UDP,buff)
+    thread second (q_get,buff);        // spawn new thread that calls q_get(buff)
 
-	  return 0;
-	}
-
+    // synchronize threads:
+    first.join();                // pauses until first finishes
+    second.join();               // pauses until second finishes
+    return 0;
+}
