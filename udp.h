@@ -71,11 +71,10 @@ void udp::setTarget(char *targetHost, int targetPort) {
 }
 
 char udp::rxchar() {
-  struct sockaddr_in packetRemoteAddress;
-  socklen_t addrlen = sizeof(packetRemoteAddress);
+  socklen_t addrlen = sizeof(remoteAddress);
 
   char *buf = new char();
-  int recvlen = recvfrom(*sock, buf, 1, 0, (struct sockaddr *) &packetRemoteAddress, &addrlen);
+  int recvlen = recvfrom(*sock, buf, 1, 0, (struct sockaddr *) remoteAddress, &addrlen);
   return buf[0];
 }
 

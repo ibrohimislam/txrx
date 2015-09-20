@@ -41,6 +41,7 @@ void transmitRoutine() {
     
     printf("Mengirim byte ke-%d: ‘%c’\n", ++ibyte, buffer);
     udpSocket->txchar(buffer);
+    usleep(50000u);
 
     ifile >> buffer;
   }
