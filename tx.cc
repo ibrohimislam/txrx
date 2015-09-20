@@ -35,7 +35,7 @@ void transmitRoutine() {
   while (!ifile.eof()) {
     
     if (receive_xoff) {
-      cout << "waiting for XON" << endl;
+      cout << "Menunggu XON" << endl;
       cv.wait(lck);
     }  
     
@@ -47,6 +47,7 @@ void transmitRoutine() {
   }
 
   tx = false;
+  printf("Mengirim ETX\n");
   udpSocket->txchar(ETX);
   ifile.close();
 }
@@ -56,9 +57,10 @@ void listenRoutine() {
     char controlChar = udpSocket->rxchar();
     
     if (controlChar == XOFF) {
-      cout << "receive XOFF" << endl;
+      cout << "Menerima XOFF" << endl;
       receive_xoff = true;
     } else if (controlChar == XON) {
+      cout << "Menerima XON" << endl;
       receive_xoff = false;
       cv.notify_all();
     }
@@ -80,11 +82,8 @@ int main(int argc, char* argv[])  {
   ifile.unsetf(ios_base::skipws);
   udpSocket = new udp(0);
   localPort = udpSocket->getLocalPort();
-
-  cout << "Listening on 0.0.0.0:" << localPort << endl;
-
+  
   udpSocket->setTarget(targetHost, targetPort);
-
   thread transmitter(transmitRoutine);
   thread listenner(listenRoutine);
 

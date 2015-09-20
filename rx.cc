@@ -10,6 +10,7 @@
 #include <mutex>
 #include <thread>
 
+const int MAX = 50;
 const int minimumUpperLimit = 10;  /*10 adalah space minimum yang akan mengaktifkan XOFF*/
 const int maximumLowerLimit = 20;  /*20 adalah space minimum untuk mengaktifkan XON*/
 
@@ -50,6 +51,7 @@ void rcvchar(udp* UDP, circularBuffer *buff) {
         current = UDP->rxchar();
     }
 
+    printf("Menerima ETX\n");
     receive_etx = true;
 }
 
@@ -65,7 +67,7 @@ void q_get(udp* UDP, circularBuffer *buff)
 
             //cout << buff->getBufferSpace() << endl;
             if ((buff->getBufferSpace() > maximumLowerLimit) && send_xoff){
-                cout << "There is space in buffer, send XON" << endl;
+                cout << "There is some space in buffer, send XON" << endl;
                 UDP->txchar(XON);
                 send_xoff=false;
                 cv.notify_all();
@@ -74,10 +76,17 @@ void q_get(udp* UDP, circularBuffer *buff)
     }
 }
 
-int main()
-{
-    circularBuffer *buff = new circularBuffer();
-    udp *UDP = new udp(6000);
+int main(int argc, char* argv[])  {
+  
+    if (argc < 2) {
+        cout << "usage: rx [port]" << endl;
+        return 0;
+    }
+
+    int hostPort = atoi(argv[1]);
+
+    circularBuffer *buff = new circularBuffer(MAX); // create circular buffer with size = MAX
+    udp *UDP = new udp(hostPort);
 
     thread first (rcvchar, UDP, buff); // spawn new thread that calls rcvchar(UDP,buff)
     thread second (q_get, UDP, buff);  // spawn new thread that calls q_get(buff)
