@@ -21,11 +21,11 @@ void rcvchar(udp* UDP, circularBuffer *buff)
 {
     Byte current;
 
-    current = UDP->rxchar();
     while ((current !=ETX) && (sent_xonxoff==XON)){
         
         if (current!=0)
         {
+            current = UDP->rxchar();
             buff->addElmt(current);
             
             cout<< "Menerima byte ke-"<< nbyteBuffered<<endl;
@@ -36,8 +36,6 @@ void rcvchar(udp* UDP, circularBuffer *buff)
                 sent_xonxoff=XOFF;
             }
         }
-
-        current = UDP->rxchar();
     }
 }
 
